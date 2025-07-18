@@ -7,3 +7,4 @@ def get_db_connection():
         password="Mysql2024",
         database="share_watchlist"
     )
+#db connection

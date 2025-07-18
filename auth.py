@@ -50,3 +50,4 @@ def login_screen():
         conn.close()
 
     add_flat_button(win, "Login", login)
+#auth page

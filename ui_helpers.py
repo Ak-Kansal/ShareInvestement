@@ -17,3 +17,4 @@ def add_flat_button(frame, text, command):
     btn = tk.Button(frame, text=text, command=command, bg="#4CAF50", fg="white", padx=10, pady=5, relief=tk.FLAT)
     btn.pack(pady=5, fill='x', padx=20)
     return btn
+# ui_helpers.py

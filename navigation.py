@@ -8,3 +8,4 @@ def show_main_screen(root):
     tk.Label(root, text="📈 Share Watchlist", font=("Helvetica", 18)).pack(pady=30)
     tk.Button(root, text="Register", command=lambda: register_screen(root), width=20, height=2).pack(pady=10)
     tk.Button(root, text="Login", command=lambda: login_screen(root), width=20, height=2).pack(pady=10)
+# Main screen setup

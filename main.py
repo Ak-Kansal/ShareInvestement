@@ -10,3 +10,4 @@ tk.Button(root, text="Register", command=register_screen, width=20, height=2).pa
 tk.Button(root, text="Login", command=login_screen, width=20, height=2).pack(pady=10)
 
 root.mainloop()
+#navigation.py

@@ -154,3 +154,4 @@ def show_dashboard(user):
     add_flat_button(dash, "View Holdings", open_holdings)
     add_flat_button(dash, "Transaction History", open_transactions)
     add_flat_button(dash, "Profit/Loss Summary", open_profit_loss)
+#dashboard page
