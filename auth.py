@@ -17,7 +17,7 @@ def register_screen():
         password = password_entry.get()
         hashed_pw = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         try:
-            cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, hashed_pw))
+            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_pw))
             conn.commit()
             messagebox.showinfo("Success", "Registration successful")
             win.destroy()
@@ -39,7 +39,7 @@ def login_screen():
         username = username_entry.get()
         password = password_entry.get()
 
-        cursor.execute("SELECT * FROM users WHERE username=%s", (username,))
+        cursor.execute("SELECT * FROM users WHERE username=?", (username,))
         user = cursor.fetchone()
 
         if user and bcrypt.checkpw(password.encode(), user['password'].encode()):

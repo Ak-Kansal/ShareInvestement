@@ -14,7 +14,7 @@ def show_dashboard(user):
     def refresh_balance():
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT balance FROM users WHERE id=%s", (user['id'],))
+        cursor.execute("SELECT balance FROM users WHERE id=?", (user['id'],))
         user['balance'] = cursor.fetchone()[0]
         conn.close()
         balance_label.config(text=f"Balance: ₹{user['balance']:.2f}")
@@ -34,20 +34,20 @@ def show_dashboard(user):
                 return
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT id, quantity, avg_price FROM shares WHERE user_id=%s AND symbol=%s", (user['id'], sym))
+            cursor.execute("SELECT id, quantity, avg_price FROM shares WHERE user_id=? AND symbol=?", (user['id'], sym))
             row = cursor.fetchone()
             if row:
                 sid, existing_qty, avg_price = row
                 new_qty = existing_qty + qt
                 new_avg = ((existing_qty * avg_price) + (qt * pr)) / new_qty
-                cursor.execute("UPDATE shares SET quantity=%s, avg_price=%s WHERE id=%s", (new_qty, new_avg, sid))
+                cursor.execute("UPDATE shares SET quantity=?, avg_price=? WHERE id=?", (new_qty, new_avg, sid))
             else:
-                cursor.execute("INSERT INTO shares (user_id, symbol, quantity, avg_price) VALUES (%s, %s, %s, %s)",
+                cursor.execute("INSERT INTO shares (user_id, symbol, quantity, avg_price) VALUES (?, ?, ?, ?)",
                                (user['id'], sym, qt, pr))
-            cursor.execute("INSERT INTO transactions (user_id, symbol, type, quantity, price) VALUES (%s, %s, 'BUY', %s, %s)",
+            cursor.execute("INSERT INTO transactions (user_id, symbol, type, quantity, price) VALUES (?, ?, 'BUY', ?, ?)",
                            (user['id'], sym, qt, pr))
             user['balance'] -= cost
-            cursor.execute("UPDATE users SET balance=%s WHERE id=%s", (user['balance'], user['id']))
+            cursor.execute("UPDATE users SET balance=? WHERE id=?", (user['balance'], user['id']))
             conn.commit()
             conn.close()
             refresh_balance()
@@ -67,20 +67,20 @@ def show_dashboard(user):
             sym, pr, qt = symbol.get(), float(price.get()), int(qty.get())
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute("SELECT id, quantity FROM shares WHERE user_id=%s AND symbol=%s", (user['id'], sym))
+            cursor.execute("SELECT id, quantity FROM shares WHERE user_id=? AND symbol=?", (user['id'], sym))
             row = cursor.fetchone()
             if not row or row[1] < qt:
                 messagebox.showerror("Error", "Not enough shares")
                 return
             remaining_qty = row[1] - qt
             if remaining_qty == 0:
-                cursor.execute("DELETE FROM shares WHERE id=%s", (row[0],))
+                cursor.execute("DELETE FROM shares WHERE id=?", (row[0],))
             else:
-                cursor.execute("UPDATE shares SET quantity=%s WHERE id=%s", (remaining_qty, row[0]))
-            cursor.execute("INSERT INTO transactions (user_id, symbol, type, quantity, price) VALUES (%s, %s, 'SELL', %s, %s)",
+                cursor.execute("UPDATE shares SET quantity=? WHERE id=?", (remaining_qty, row[0]))
+            cursor.execute("INSERT INTO transactions (user_id, symbol, type, quantity, price) VALUES (?, ?, 'SELL', ?, ?)",
                            (user['id'], sym, qt, pr))
             user['balance'] += pr * qt
-            cursor.execute("UPDATE users SET balance=%s WHERE id=%s", (user['balance'], user['id']))
+            cursor.execute("UPDATE users SET balance=? WHERE id=?", (user['balance'], user['id']))
             conn.commit()
             conn.close()
             refresh_balance()
@@ -105,7 +105,7 @@ def show_dashboard(user):
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT symbol, quantity, avg_price FROM shares WHERE user_id=%s", (user['id'],))
+        cursor.execute("SELECT symbol, quantity, avg_price FROM shares WHERE user_id=?", (user['id'],))
         holdings = cursor.fetchall()
 
         def populate_table():
@@ -126,7 +126,7 @@ def show_dashboard(user):
         win = create_window("Transaction History", "500x400")
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT symbol, type, quantity, price, date FROM transactions WHERE user_id=%s ORDER BY date DESC", (user['id'],))
+        cursor.execute("SELECT symbol, type, quantity, price, date FROM transactions WHERE user_id=? ORDER BY date DESC", (user['id'],))
         for t in cursor.fetchall():
             tk.Label(win, text=f"{t[4].strftime('%Y-%m-%d')} | {t[1]} {t[2]} {t[0]} @ ₹{t[3]}").pack()
         conn.close()
@@ -135,7 +135,7 @@ def show_dashboard(user):
         win = create_window("Profit/Loss")
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT symbol, quantity, avg_price FROM shares WHERE user_id=%s", (user['id'],))
+        cursor.execute("SELECT symbol, quantity, avg_price FROM shares WHERE user_id=?", (user['id'],))
         total_inv = total_val = 0
         for row in cursor.fetchall():
             sym, qty, avg = row
